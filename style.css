@@ -39,7 +39,7 @@ body {
   background-color: grey;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: 2.25fr repeat(5, 1fr);
+  grid-template-rows: 3fr repeat(5, 1fr);
   gap: 3px;
 }
 
@@ -64,7 +64,8 @@ button:active {
   box-shadow: -1px -1px;
 }
 
-.display {
+/* original */
+/* .display {
   border-radius: 5px;
   grid-column: 1/5;
   display: grid;
@@ -74,21 +75,36 @@ button:active {
   text-shadow: #0dc28e 0 0 5px;
   color: #03b885;
   background-color: rgb(46, 40, 40);
-  font-weight: 500;
+  word-break: 
+  break-all;
+} */
+
+.display {
+  border-radius: 5px;
+  grid-column: 1/5;
+  display: flex;
+  flex-direction: column;
+  letter-spacing: 0.05rem;
+  font-family: 'Chakra Petch', sans-serif;
+  text-shadow: #0dc28e 0 0 5px;
+  color: #03b885;
+  background-color: rgb(46, 40, 40);
   word-break: break-all;
 }
 
-.display > div {
-  align-self: center;
-  padding: 0 10px;
+.display-cur,
+.display-prev {
+  padding: 5px;
 }
 
 .display-cur {
+  height: 60%;
   text-align: right;
-  font-size: 1.7rem;
+  font-size: 1.8rem;
 }
 
 .display-prev {
+  height: 40%;
   text-align: right;
   font-size: 1rem;
 }

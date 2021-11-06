@@ -8,4 +8,12 @@ To fix:
 
 - ✔DONE to not be able to type anything when the result is being displayed
 
--add keboard events
+- ✔DONE add keboard events
+
+- can't change operation type like + to - etc
+
+- display keeps changing height when the numbers are too long - playing with max length of numbers and grid vs flex settings of display
+
+- can only display 15 numbers if . is present (16char length limit)
+
+- add locale!

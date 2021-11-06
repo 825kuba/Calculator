@@ -15,34 +15,21 @@ class Calculator {
     this.curOperation = curOperation;
 
     // INITIAL ALL CLEAR
-    this.init();
-
-    //EVENT HANDLERS
-    // this.calculatorBody.addEventListener(
-    //   'click',
-    //   this.displayNumber.bind(this)
-    // );
-    this.calculatorBody.addEventListener('click', this.deleteNumber.bind(this));
-    this.calculatorBody.addEventListener(
-      'click',
-      this.changeNumberSign.bind(this)
-    );
-    this.calculatorBody.addEventListener('click', this.allClear.bind(this));
-    this.calculatorBody.addEventListener('click', this.doOperation.bind(this));
-    this.calculatorBody.addEventListener(
-      'click',
-      this.displayResult.bind(this)
-    );
+    this.allClear();
   }
 
   displayNumber = function (number) {
-    //CHECK IF RESULT IS BEING DISPLAYED
-    if (this.prevOperation.textContent.includes('=')) this.init();
-    // MAX 16 CHARS CHECK
-    if (this.curOperation.textContent.length >= 16) return;
-    //ONLY 1 COMMA CHECK
+    //RUN ALL CLEAR IF RESULT IS BEING DISPLAYED
+    if (this.prevOperation.textContent.includes('=')) this.allClear();
+    // MAX 16 NUMBERS (17 chars with '.')
+    if (this.curOperation.textContent.includes('.')) {
+      if (this.curOperation.textContent.length >= 10) return;
+    } else {
+      if (this.curOperation.textContent.length >= 9) return;
+    }
+    //ONLY 1 COMMA
     if (number === '.' && this.curOperation.textContent.includes('.')) return;
-    //ONLY 1 ZERO IN THE BEGINNING CHECK
+    //ONLY 1 ZERO IN THE BEGINNING
     if (number === '0' && this.curOperation.textContent === '0') return;
     // DISPLAY NUMBER
     this.curOperation.textContent += number;
@@ -56,49 +43,21 @@ class Calculator {
     this.curValue = +this.curOperation.textContent;
   };
 
-  // // ORIGINAL=======++++++=======
-  // displayNumber = function (e) {
-  //   const btn = e.target.closest('.num');
-  //   if (!btn) return;
-  //   //CHECK IF RESULT IS BEING DISPLAYED
-  //   if (this.prevOperation.textContent.includes('=')) this.init();
-  //   //GET NUMBER VALUE
-  //   const value = btn.dataset.value;
-  //   // MAX 16 CHARS CHECK
-  //   if (this.curOperation.textContent.length >= 16) return;
-  //   //ONLY 1 COMMA CHECK
-  //   if (value === '.' && this.curOperation.textContent.includes('.')) return;
-  //   //ONLY 1 ZERO IN THE BEGINNING CHECK
-  //   if (value === '0' && this.curOperation.textContent === '0') return;
-  //   // DISPLAY NUMBER
-  //   this.curOperation.textContent += value;
-  //   //REMOVE THE ZERO IN THE BEGINNING
-  //   if (
-  //     this.curOperation.textContent[0] === '0' &&
-  //     this.curOperation.textContent[1] !== '.'
-  //   )
-  //     this.curOperation.textContent = this.curOperation.textContent.slice(1);
-  //   //ADD NUMBER TO MEMORY
-  //   this.curValue = +this.curOperation.textContent;
-  // };
-
-  doOperation = function (e) {
-    const btn = e.target.closest('.operation');
-    if (!btn) return;
+  doOperation = operation => {
     // CHECK IF ANY NUMBERS EXIST
     if (!this.curValue) return;
     //IF PREV VALUE IS EMPTY SET IT AND DISPLAY THE OPERATION TYPE
     if (!this.prevValue) {
       this.prevValue = this.curValue;
-      this.operationType = btn.dataset.value;
+      this.operationType = operation;
     }
     //ELSE IF THE PREV VALUE ALREADY EXISTS, FIRST DO THE CALCULATION AND THEN SET THE NEW OPERATION TYPE
     else if (this.prevValue && !this.prevOperation.textContent.includes('=')) {
       this.prevValue = this.doCalculation();
-      this.operationType = btn.dataset.value;
+      this.operationType = operation;
       //ELSE IF THE RESULT IS BEING DISPLAYED, DISPLAY THE RESULT AND THE NEW OPERATION SYMBOL IN PREV OPERARION
     } else {
-      this.operationType = btn.dataset.value;
+      this.operationType = operation;
       this.prevOperation.textContent = `${this.prevValue} ${
         this.operationType === '/' ? '÷' : this.operationType
       }`;
@@ -119,22 +78,7 @@ class Calculator {
     if (this.operationType === '/') return this.prevValue / this.curValue;
   };
 
-  displayResult = function (e) {
-    const btn = e.target.closest('.result');
-    if (!btn) return;
-    // CHECK IF NUMBERS EXIST
-    if (!this.operationType) return;
-    // DO CALCULATION AND DISPLAY IT
-    this.prevOperation.textContent = `${this.prevValue} ${
-      this.operationType === '/' ? '÷' : this.operationType
-    } ${this.curValue} =`;
-    this.prevValue = this.doCalculation();
-    this.curOperation.textContent = this.prevValue;
-  };
-
-  deleteNumber = function (e) {
-    const btn = e.target.closest('.delete');
-    if (!btn) return;
+  deleteNumber = () => {
     // NUMBER EXISTS CHECK
     if (!this.curValue) return;
     // CHECK IF RESULT IS BEING DISPLAYED
@@ -151,9 +95,18 @@ class Calculator {
     this.curValue = +this.curOperation.textContent;
   };
 
+  displayResult = function (e) {
+    // CHECK IF NUMBERS EXIST
+    if (!this.operationType) return;
+    // DO CALCULATION AND DISPLAY IT
+    this.prevOperation.textContent = `${this.prevValue} ${
+      this.operationType === '/' ? '÷' : this.operationType
+    } ${this.curValue} =`;
+    this.prevValue = this.doCalculation();
+    this.curOperation.textContent = this.prevValue;
+  };
+
   changeNumberSign = function (e) {
-    const btn = e.target.closest('.sign');
-    if (!btn) return;
     //CHECK IF RESULT IS BEING DISPLAYED
     if (this.prevOperation.textContent.includes('=')) return;
     //CHANGE SIGN OF THE NUMBER IN MEMORY
@@ -162,13 +115,7 @@ class Calculator {
     this.curOperation.textContent = this.curValue.toString();
   };
 
-  allClear = function (e) {
-    const btn = e.target.closest('.ac');
-    if (!btn) return;
-    this.init();
-  };
-
-  init = function () {
+  allClear = function () {
     //CLEAR TEXT CONTENT, LEAVE ZERO IN CUR OPERATION
     this.prevOperation.textContent = '';
     this.curOperation.textContent = '0';
@@ -181,25 +128,68 @@ class Calculator {
 
 const calculator = new Calculator(calculatorBox, displayPrev, displayCur);
 
-// SETTING UP EVENT HANDLERS
+// EVENT HANDLERS
 
 // INPUTING NUMBERS
-//CLICKS
 calculatorBox.addEventListener('click', function (e) {
   const target = e.target.closest('.num');
   if (!target) return;
   const number = target.dataset.value;
   calculator.displayNumber(number);
 });
-//KEYS
+
+//DELETING NUMBERS
+calculatorBox.addEventListener('click', function (e) {
+  const target = e.target.closest('.delete');
+  if (!target) return;
+  calculator.deleteNumber();
+});
+
+//OPERATIONS
+calculatorBox.addEventListener('click', function (e) {
+  const target = e.target.closest('.operation');
+  if (!target) return;
+  const operation = target.dataset.value;
+  calculator.doOperation(operation);
+});
+
+//DISPLAY RESULT
+calculatorBox.addEventListener('click', function (e) {
+  const target = e.target.closest('.result');
+  if (!target) return;
+  calculator.displayResult();
+});
+
+//CHANGE NUMBER SIGN
+calculatorBox.addEventListener('click', function (e) {
+  const target = e.target.closest('.sign');
+  if (!target) return;
+  calculator.changeNumberSign();
+});
+
+//CHANGE NUMBER SIGN
+calculatorBox.addEventListener('click', function (e) {
+  const target = e.target.closest('.ac');
+  if (!target) return;
+  calculator.allClear();
+});
+
+// KEYBOARD EVENT HANDLERS
 document.addEventListener('keydown', function (e) {
   e.preventDefault();
   const pressKey = e.key;
+  // INPUTING NUBMERS
   if (!isNaN(parseFloat(pressKey)) || pressKey === '.')
     calculator.displayNumber(pressKey);
+  //DELETING NUMBERS
+  if (pressKey === 'Backspace') calculator.deleteNumber();
+  //OPERATIONS
+  if (pressKey === '+') calculator.doOperation('+');
+  if (pressKey === '-') calculator.doOperation('-');
+  if (pressKey === '*') calculator.doOperation('*');
+  if (pressKey === '/') calculator.doOperation('/');
+  //DISPLAYING RESULT
+  if (pressKey === 'Enter') calculator.displayResult();
+  //ALL CLEAR
+  if (pressKey === 'Escape') calculator.allClear();
 });
-
-//DELETING NUMBERS
-//CLICK
-
-//KEYS
