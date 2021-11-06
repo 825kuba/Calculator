@@ -18,10 +18,10 @@ class Calculator {
     this.init();
 
     //EVENT HANDLERS
-    this.calculatorBody.addEventListener(
-      'click',
-      this.displayNumber.bind(this)
-    );
+    // this.calculatorBody.addEventListener(
+    //   'click',
+    //   this.displayNumber.bind(this)
+    // );
     this.calculatorBody.addEventListener('click', this.deleteNumber.bind(this));
     this.calculatorBody.addEventListener(
       'click',
@@ -35,19 +35,17 @@ class Calculator {
     );
   }
 
-  displayNumber = function (e) {
-    const btn = e.target.closest('.num');
-    if (!btn) return;
-    //GET NUMBER VALUE
-    const value = btn.dataset.value;
+  displayNumber = function (number) {
+    //CHECK IF RESULT IS BEING DISPLAYED
+    if (this.prevOperation.textContent.includes('=')) this.init();
     // MAX 16 CHARS CHECK
     if (this.curOperation.textContent.length >= 16) return;
     //ONLY 1 COMMA CHECK
-    if (value === '.' && this.curOperation.textContent.includes('.')) return;
+    if (number === '.' && this.curOperation.textContent.includes('.')) return;
     //ONLY 1 ZERO IN THE BEGINNING CHECK
-    if (value === '0' && this.curOperation.textContent === '0') return;
+    if (number === '0' && this.curOperation.textContent === '0') return;
     // DISPLAY NUMBER
-    this.curOperation.textContent += value;
+    this.curOperation.textContent += number;
     //REMOVE THE ZERO IN THE BEGINNING
     if (
       this.curOperation.textContent[0] === '0' &&
@@ -58,18 +56,42 @@ class Calculator {
     this.curValue = +this.curOperation.textContent;
   };
 
+  // // ORIGINAL=======++++++=======
+  // displayNumber = function (e) {
+  //   const btn = e.target.closest('.num');
+  //   if (!btn) return;
+  //   //CHECK IF RESULT IS BEING DISPLAYED
+  //   if (this.prevOperation.textContent.includes('=')) this.init();
+  //   //GET NUMBER VALUE
+  //   const value = btn.dataset.value;
+  //   // MAX 16 CHARS CHECK
+  //   if (this.curOperation.textContent.length >= 16) return;
+  //   //ONLY 1 COMMA CHECK
+  //   if (value === '.' && this.curOperation.textContent.includes('.')) return;
+  //   //ONLY 1 ZERO IN THE BEGINNING CHECK
+  //   if (value === '0' && this.curOperation.textContent === '0') return;
+  //   // DISPLAY NUMBER
+  //   this.curOperation.textContent += value;
+  //   //REMOVE THE ZERO IN THE BEGINNING
+  //   if (
+  //     this.curOperation.textContent[0] === '0' &&
+  //     this.curOperation.textContent[1] !== '.'
+  //   )
+  //     this.curOperation.textContent = this.curOperation.textContent.slice(1);
+  //   //ADD NUMBER TO MEMORY
+  //   this.curValue = +this.curOperation.textContent;
+  // };
+
   doOperation = function (e) {
     const btn = e.target.closest('.operation');
     if (!btn) return;
     // CHECK IF ANY NUMBERS EXIST
     if (!this.curValue) return;
-
     //IF PREV VALUE IS EMPTY SET IT AND DISPLAY THE OPERATION TYPE
     if (!this.prevValue) {
       this.prevValue = this.curValue;
       this.operationType = btn.dataset.value;
     }
-
     //ELSE IF THE PREV VALUE ALREADY EXISTS, FIRST DO THE CALCULATION AND THEN SET THE NEW OPERATION TYPE
     else if (this.prevValue && !this.prevOperation.textContent.includes('=')) {
       this.prevValue = this.doCalculation();
@@ -108,9 +130,6 @@ class Calculator {
     } ${this.curValue} =`;
     this.prevValue = this.doCalculation();
     this.curOperation.textContent = this.prevValue;
-    // // SET LOWER FONT SIZE IF NUMBER TOO LONG
-    // if (this.curOperation.textContent.length >= 16)
-    //   displayCur.style.fontSize = '1.5rem';
   };
 
   deleteNumber = function (e) {
@@ -135,6 +154,8 @@ class Calculator {
   changeNumberSign = function (e) {
     const btn = e.target.closest('.sign');
     if (!btn) return;
+    //CHECK IF RESULT IS BEING DISPLAYED
+    if (this.prevOperation.textContent.includes('=')) return;
     //CHANGE SIGN OF THE NUMBER IN MEMORY
     this.curValue = -this.curValue;
     //DISPLAY THE NUMBER IN TEXT CONTENT
@@ -155,9 +176,30 @@ class Calculator {
     this.prevValue = 0;
     this.curValue = 0;
     this.operationType = '';
-    // // SET ORIGINAL FONT SIZE
-    // displayCur.style.fontSize = '1.8rem';
   };
 }
 
 const calculator = new Calculator(calculatorBox, displayPrev, displayCur);
+
+// SETTING UP EVENT HANDLERS
+
+// INPUTING NUMBERS
+//CLICKS
+calculatorBox.addEventListener('click', function (e) {
+  const target = e.target.closest('.num');
+  if (!target) return;
+  const number = target.dataset.value;
+  calculator.displayNumber(number);
+});
+//KEYS
+document.addEventListener('keydown', function (e) {
+  e.preventDefault();
+  const pressKey = e.key;
+  if (!isNaN(parseFloat(pressKey)) || pressKey === '.')
+    calculator.displayNumber(pressKey);
+});
+
+//DELETING NUMBERS
+//CLICK
+
+//KEYS
