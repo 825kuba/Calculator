@@ -23,9 +23,9 @@ class Calculator {
     if (this.prevOperation.textContent.includes('=')) this.allClear();
     // MAX 16 NUMBERS (17 chars with '.')
     if (this.curOperation.textContent.includes('.')) {
-      if (this.curOperation.textContent.length >= 17) return;
+      if (this.curOperation.textContent.length >= 10) return;
     } else {
-      if (this.curOperation.textContent.length >= 16) return;
+      if (this.curOperation.textContent.length >= 9) return;
     }
     //ONLY 1 COMMA
     if (number === '.' && this.curOperation.textContent.includes('.')) return;
@@ -41,21 +41,6 @@ class Calculator {
       this.curOperation.textContent = this.curOperation.textContent.slice(1);
     //ADD NUMBER TO MEMORY
     this.curValue = +this.curOperation.textContent;
-    // //CHECK AND POSSIBLY ADJUST FONT SIZE
-    // this.adjustFontSize(this.curOperation);
-    // CONVERT TO LOCALE
-    // this.displayLocale(this.curValue, this.curOperation);
-  };
-
-  // adjustFontSize = display => {
-  //   // if (display.clientWidth < this.calculatorBody.clientWidth)
-  //   //   console.log('overflow');
-  //   console.log(this.calculatorBody.clientWidth);
-  //   console.log(this.curOperation.clientWidth);
-  // };
-
-  displayLocale = (number, display) => {
-    display.textContent = parseFloat(number).toLocaleString('en');
   };
 
   doOperation = operation => {
