@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch&display=swap');
 
+:root {
+  --background-primary: rgb(86, 156, 86);
+  --background-secondary: rgb(77, 119, 64);
+  --calculator-primary: rgb(75, 109, 155);
+  --buttons-primary: rgb(54, 55, 56);
+  --buttons-secondary: rgb(139, 39, 69);
+  --buttons-font: rgb(196, 198, 199);
+  --buttons-shadow: rgb(148, 148, 148);
+  --display-primary: rgb(46, 40, 40);
+  --display-secondary: rgb(173, 182, 179);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,64 +19,73 @@
 }
 
 html {
-  font-family: sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
   padding-top: 50px;
   max-width: 100vw;
   max-height: 100vh;
-  background: rgb(34, 193, 195);
+  background: var(--background-primary);
   background: linear-gradient(
     90deg,
-    rgba(34, 193, 195, 1) 0%,
-    rgba(253, 187, 45, 1) 100%
+    var(--background-primary) 0%,
+    var(--background-secondary) 100%
   );
 }
 
+/* OUTSIDE BOX OF CALCULATOR */
 .calculator-outer {
   width: 320px;
   height: 420px;
   padding: 15px;
-  background-color: grey;
-  border: 2px solid black;
+  background-color: var(--calculator-primary);
   border-radius: 10px;
+  border: 1px solid var(--buttons-primary);
   margin: 0 auto;
   box-shadow: 5px 10px 10px;
 }
 
+/* MAIN LAYOUT */
 .calculator {
   margin: 0 auto;
   width: 100%;
   height: 100%;
-  background-color: grey;
+  background-color: var(--calculator-primary);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 3fr repeat(5, 1fr);
-  gap: 3px;
+  gap: 5px;
 }
 
+/* BUTTONS */
 button {
-  background-color: darkgrey;
+  background-color: var(--buttons-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   border: none;
   border-radius: 5px;
-  box-shadow: 1.5px 1.5px 1.5px;
+  box-shadow: -1px -1px var(--buttons-shadow);
+  color: var(--buttons-font);
 }
-
 button:hover {
-  background-color: rgb(151, 148, 148);
   cursor: pointer;
 }
-
 button:active {
-  background-color: darkgrey;
-  box-shadow: -1px -1px;
+  box-shadow: 0 0;
+  position: relative;
+  transform: translate(1px, 1px);
 }
 
+/* ALL CLEAR BTN */
+.ac {
+  grid-column: 1/3;
+  background-color: var(--buttons-secondary);
+}
+
+/* DISPLAY */
 .display {
   border-radius: 5px;
   grid-column: 1/5;
@@ -72,33 +93,32 @@ button:active {
   flex-direction: column;
   letter-spacing: 0.05rem;
   font-family: 'Chakra Petch', sans-serif;
-  text-shadow: #0dc28e 0 0 5px;
-  color: #03b885;
-  background-color: rgb(46, 40, 40);
-  word-break: break-all;
-  max-height: 100%;
+  color: var(--display-secondary);
+  background-color: var(--display-primary);
 }
 
+/* TOP AND BOTTOM ROW OF DISPLAY */
 .display-cur,
 .display-prev {
   padding: 0 5px;
   display: flex;
-  align-items: flex-end;
   justify-content: flex-end;
+  text-align: right;
 }
 
+/* BOTTOM ROW OF DISPLAY */
 .display-cur {
-  height: 80%;
-  text-align: right;
-  font-size: 2.5rem;
+  height: 70%;
+  font-size: 2.4rem;
+  word-break: break-all;
+  align-items: flex-end;
 }
 
+/* TOP ROW OF DISPLAY */
 .display-prev {
-  height: 20%;
-  text-align: right;
-  font-size: 1rem;
-}
-
-.ac {
-  grid-column: 1/3;
+  height: 30%;
+  font-size: 1.2rem;
+  align-items: center;
+  white-space: nowrap;
+  overflow-x: hidden;
 }

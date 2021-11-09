@@ -19,107 +19,94 @@ class Calculator {
   }
 
   displayNumber = function (number) {
-    //RUN ALL CLEAR IF RESULT IS BEING DISPLAYED
+    // RUN ALL CLEAR IF RESULT IS BEING DISPLAYED
     if (this.prevOperation.textContent.includes('=')) this.allClear();
-    // MAX 16 NUMBERS (17 chars with '.')
+    // ALLOW MAX 9 NUMBERS AND ONLY ONE '.'
     if (this.curOperation.textContent.includes('.')) {
-      if (this.curOperation.textContent.length >= 10) return;
+      if (this.curOperation.textContent.length >= 10 || number === '.') return;
     } else {
       if (this.curOperation.textContent.length >= 9) return;
     }
-    //ONLY 1 COMMA
-    if (number === '.' && this.curOperation.textContent.includes('.')) return;
-    //ONLY 1 ZERO IN THE BEGINNING
-    if (number === '0' && this.curOperation.textContent === '0') return;
-    // DISPLAY NUMBER
-    this.curOperation.textContent += number;
-    //REMOVE THE ZERO IN THE BEGINNING
-    if (
-      this.curOperation.textContent[0] === '0' &&
-      this.curOperation.textContent[1] !== '.'
-    )
+    //REMOVE ZERO BEFORE INTEGERES
+    if (this.curOperation.textContent === '0' && number !== '.')
       this.curOperation.textContent = this.curOperation.textContent.slice(1);
-    //ADD NUMBER TO MEMORY
-    this.curValue = +this.curOperation.textContent;
-  };
-
-  doOperation = operation => {
-    // CHECK IF ANY NUMBERS EXIST
-    if (!this.curValue) return;
-    //IF PREV VALUE IS EMPTY SET IT AND DISPLAY THE OPERATION TYPE
-    if (!this.prevValue) {
-      this.prevValue = this.curValue;
-      this.operationType = operation;
-    }
-    //ELSE IF THE PREV VALUE ALREADY EXISTS, FIRST DO THE CALCULATION AND THEN SET THE NEW OPERATION TYPE
-    else if (this.prevValue && !this.prevOperation.textContent.includes('=')) {
-      this.prevValue = this.doCalculation();
-      this.operationType = operation;
-      //ELSE IF THE RESULT IS BEING DISPLAYED, DISPLAY THE RESULT AND THE NEW OPERATION SYMBOL IN PREV OPERARION
-    } else {
-      this.operationType = operation;
-      this.prevOperation.textContent = `${this.prevValue} ${
-        this.operationType === '/' ? '÷' : this.operationType
-      }`;
-      this.curOperation.textContent = '0';
-      this.curValue = 0;
-    }
-    this.prevOperation.textContent = `${this.prevValue} ${
-      this.operationType === '/' ? '÷' : this.operationType
-    }`;
-    this.curOperation.textContent = '0';
-    this.curValue = 0;
-  };
-
-  doCalculation = function () {
-    if (this.operationType === '+') return this.prevValue + this.curValue;
-    if (this.operationType === '-') return this.prevValue - this.curValue;
-    if (this.operationType === '*') return this.prevValue * this.curValue;
-    if (this.operationType === '/') return this.prevValue / this.curValue;
+    // DISPLAY THE NUMBER
+    this.curOperation.textContent += number;
+    // // ADD ZERO BEFORE '.'
+    if (this.curOperation.textContent === '.')
+      this.curOperation.textContent = '0.';
   };
 
   deleteNumber = () => {
-    // CHECK IF RESULT IS BEING DISPLAYED
+    // RETURN IF RESULT IS BEING DISPLAYED
     if (this.prevOperation.textContent.includes('=')) return;
     //REMOVE LAST CHARACTER FROM TEXT CONTENT
     this.curOperation.textContent = this.curOperation.textContent.slice(0, -1);
-    // DISPLAY ZERO WHEN EVERYTHING WAS DELETED
-    if (
-      this.curOperation.textContent === '-' ||
-      this.curOperation.textContent === ''
-    )
-      this.curOperation.textContent = '0';
-    //ADD NUMBER TO MEMORY
-    this.curValue = +this.curOperation.textContent;
+    // PREVENT '-' FROM BEING LEFT ON DISPLAY
+    if (this.curOperation.textContent === '-')
+      this.curOperation.textContent = '';
   };
 
-  displayResult = function (e) {
-    // CHECK IF NUMBERS EXIST
-    if (!this.operationType) return;
-    // DO CALCULATION AND DISPLAY IT
+  chooseOperation = operation => {
+    // SAVE CUR VALUE
+    this.curValue = this.curOperation.textContent;
+    // IF PREV VALUE EMPTY, OR THE RESULT IS BEING DISPLAYED, SET THE PREV VALUE AND OPERATION TYPE
+    if (!this.prevValue || this.prevOperation.textContent.includes('=')) {
+      this.prevValue = this.curValue;
+      this.operationType = operation;
+    }
+    // ELSE FIRST DO THE CALCULATION AND THEN SET THE NEW OPERATION TYPE
+    else {
+      this.prevValue = this.doCalculation();
+      this.operationType = operation;
+    }
+    //DISPLAY PREV VALUE + OPERATION
+    this.prevOperation.textContent = `${this.prevValue} ${
+      this.operationType === '/' ? '÷' : this.operationType
+    }`;
+    //EMPTY CUR VALUE
+    this.curValue = '';
+    this.curOperation.textContent = '';
+  };
+
+  doCalculation = function () {
+    // IF CUR VALUE EMPTY, RETURN PREV VALUE - ALLOWS TO CHANGE OPERTION SYMBOL
+    if (!this.curValue) return this.prevValue;
+    if (this.operationType === '+')
+      return parseFloat(this.prevValue) + parseFloat(this.curValue);
+    if (this.operationType === '-')
+      return parseFloat(this.prevValue) - parseFloat(this.curValue);
+    if (this.operationType === '*')
+      return parseFloat(this.prevValue) * parseFloat(this.curValue);
+    if (this.operationType === '/')
+      return parseFloat(this.prevValue) / parseFloat(this.curValue);
+  };
+
+  displayResult = () => {
+    // SAVE CUR VALUE TO MEMORY
+    this.curValue = this.curOperation.textContent;
+    // CHECK IF OPERATION TYPE  OR CUR VALUE EXISTS
+    if (!this.operationType || !this.curValue) return;
+    // DISPLAY OPERATION IN PREV OPERATION FIELD
     this.prevOperation.textContent = `${this.prevValue} ${
       this.operationType === '/' ? '÷' : this.operationType
     } ${this.curValue} =`;
-    this.prevValue = this.doCalculation();
-    this.curOperation.textContent = this.prevValue;
+    // //DISPLAY RESULT IN CUR OPERATION FIELD
+    this.curOperation.textContent = this.doCalculation();
   };
 
-  changeNumberSign = function (e) {
-    //CHECK IF RESULT IS BEING DISPLAYED
-    if (this.prevOperation.textContent.includes('=')) return;
-    //CHANGE SIGN OF THE NUMBER IN MEMORY
-    this.curValue = -this.curValue;
-    //DISPLAY THE NUMBER IN TEXT CONTENT
-    this.curOperation.textContent = this.curValue.toString();
+  changeNumberSign = () => {
+    // CHANGE SIGN OF THE NUMBER ON DISPLAY
+    this.curOperation.textContent = -+this.curOperation.textContent.toString();
   };
 
-  allClear = function () {
-    //CLEAR TEXT CONTENT, LEAVE ZERO IN CUR OPERATION
+  allClear = () => {
+    //CLEAR TEXT CONTENT
     this.prevOperation.textContent = '';
-    this.curOperation.textContent = '0';
+    this.curOperation.textContent = '';
     //CLEAR MEMORY
-    this.prevValue = 0;
-    this.curValue = 0;
+    this.prevValue = '';
+    this.curValue = '';
     this.operationType = '';
   };
 }
@@ -148,7 +135,7 @@ calculatorBox.addEventListener('click', function (e) {
   const target = e.target.closest('.operation');
   if (!target) return;
   const operation = target.dataset.value;
-  calculator.doOperation(operation);
+  calculator.chooseOperation(operation);
 });
 
 //DISPLAY RESULT
@@ -182,10 +169,10 @@ document.addEventListener('keydown', function (e) {
   //DELETING NUMBERS
   if (pressKey === 'Backspace') calculator.deleteNumber();
   //OPERATIONS
-  if (pressKey === '+') calculator.doOperation('+');
-  if (pressKey === '-') calculator.doOperation('-');
-  if (pressKey === '*') calculator.doOperation('*');
-  if (pressKey === '/') calculator.doOperation('/');
+  if (pressKey === '+') calculator.chooseOperation('+');
+  if (pressKey === '-') calculator.chooseOperation('-');
+  if (pressKey === '*') calculator.chooseOperation('*');
+  if (pressKey === '/') calculator.chooseOperation('/');
   //DISPLAYING RESULT
   if (pressKey === 'Enter') calculator.displayResult();
   //ALL CLEAR
